@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Carousel</title>
+    <link rel="stylesheet" href="design.css">
+</head>
+<body>
+
+<div class="slideshow-container"></div>
+<br>
+<div style="text-align:center" id="dots-container"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    fetch('images.xml')
+        .then(response => response.text())
+        .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+        .then(data => {
+            const imageNodes = data.getElementsByTagName("image");
+            const slideshowContainer = document.querySelector(".slideshow-container");
+            const dotsContainer = document.getElementById("dots-container");
+
+            if (imageNodes.length === 0) {
+                console.error("No images found in images.xml");
+                return;
+            }
+
+            for (let i = 0; i < imageNodes.length; i++) {
+                let slideDiv = document.createElement("div");
+                slideDiv.className = "mySlides fade";
+
+                let imgElement = document.createElement("img");
+                imgElement.src = imageNodes[i].getAttribute("src");
+                imgElement.style.width = "100%";
+                slideDiv.appendChild(imgElement);
+                slideshowContainer.appendChild(slideDiv);
+
+                let dot = document.createElement("span");
+                dot.className = "dot";
+                dot.setAttribute("onclick", `currentSlide(${i + 1})`);
+                dotsContainer.appendChild(dot);
+            }
+
+            let prevButton = document.createElement("a");
+            prevButton.className = "prev";
+            prevButton.innerHTML = "❮";
+            prevButton.setAttribute("onclick", "plusSlides(-1)");
+
+            let nextButton = document.createElement("a");
+            nextButton.className = "next";
+            nextButton.innerHTML = "❯";
+            nextButton.setAttribute("onclick", "plusSlides(1)");
+
+            slideshowContainer.appendChild(prevButton);
+            slideshowContainer.appendChild(nextButton);
+
+            // Ensure the first slide is visible
+            showSlides(slideIndex);
+        })
+        .catch(error => console.error("Error loading XML:", error));
+});
+
+
+
+    let slideIndex = 1;
+    function plusSlides(n) {
+    showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+    showSlides(slideIndex = n);
+}
+
+
+    function showSlides(n) {
+        let slides = document.getElementsByClassName("mySlides");
+        let dots = document.getElementsByClassName("dot");
+        if (slides.length === 0) return;
+        
+        if (n > slides.length) {slideIndex = 1;}    
+        if (n < 1) {slideIndex = slides.length;}
+        
+        for (let i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";  
+        }
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+        }
+        
+        slides[slideIndex-1].style.display = "block";  
+        dots[slideIndex-1].className += " active";
+    }
+</script>
+
+</body>
+</html>
